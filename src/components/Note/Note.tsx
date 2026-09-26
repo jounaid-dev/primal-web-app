@@ -1,5 +1,5 @@
-// import { A } from '@solidjs/router';
-import { batch, Component, createEffect, Match, on, onMount, Show, Switch } from 'solid-js';
+import { A } from '@solidjs/router';
+import { batch, Component, createEffect, createSignal, Match, on, onMount, Show, Switch } from 'solid-js';
 import { PrimalNote, PrimalUser, TopZap, ZapOption } from '../../types/primal';
 import ParsedNote from '../ParsedNote/ParsedNote';
 import NoteFooter from './NoteFooter/NoteFooter';
@@ -76,6 +76,31 @@ const Note: Component<NoteProps> = (props) => {
   const threadContext = useThreadContext();
   const app = useAppContext();
   const navigate = useNavigate();
+
+  const [translatedText, setTranslatedText] = createSignal<string | null>(null);
+  const [isTranslating, setIsTranslating] = createSignal<boolean>(false);
+
+  const handleTranslate = async () => {
+    if (isTranslating()) return;
+    setIsTranslating(true);
+
+    try {
+      if (props.onTranslate) {
+        props.onTranslate();
+      }
+
+      const response = await fetch(`https://api.mytory.com/translate?text=${encodeURIComponent(props.note.content)}&target=fr`);
+      const data = await response.json();
+
+      if (data && data.translatedText) {
+        setTranslatedText(data.translatedText);
+      }
+    } catch (err) {
+      console.error("Erreur de traduction :", err);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
 
   createEffect(() => {
     if (props.quoteCount) {
@@ -368,7 +393,7 @@ const Note: Component<NoteProps> = (props) => {
                     customZapInfo={customZapInfo()}
                     size="notif"
                     onDelete={props.onRemove}
-                    onTranslate={props.onTranslate}
+                    onTranslate={handleTranslate}
                   />
                 </div>
               </Show>
@@ -493,7 +518,7 @@ const Note: Component<NoteProps> = (props) => {
                   onZapAnim={addTopZap}
                   noteType="primary"
                   onDelete={props.onRemove}
-                  onTranslate={props.onTranslate}
+                  onTranslate={handleTranslate}
                 />
               </div>
             </Show>
@@ -565,7 +590,7 @@ const Note: Component<NoteProps> = (props) => {
               onZapAnim={addTopZapFeed}
               size={size()}
               onDelete={props.onRemove}
-              onTranslate={props.onTranslate}
+              onTranslate={handleTranslate}
             />
           </Show>
         </div>
@@ -653,7 +678,7 @@ const Note: Component<NoteProps> = (props) => {
                     onZapAnim={addTopZapFeed}
                     size="short"
                     onDelete={props.onRemove}
-                    onTranslate={props.onTranslate}
+                    onTranslate={handleTranslate}
                   />
                 </div>
               </Show>
