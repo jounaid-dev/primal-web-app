@@ -60,6 +60,7 @@ export type NoteProps = {
   onRemove?: (id: string, isRepost?: boolean) => void,
   hideContext?: boolean,
   hideFooter?: boolean,
+  onTranslate?: () => void,
 }
 
 export const renderNote = (props: NoteProps) => (
@@ -305,11 +306,6 @@ const Note: Component<NoteProps> = (props) => {
   const size = () => props.size ?? 'normal';
 
   const bigMessageFont = () => {
-    // const hasImage = imageRegexG.test(props.note.content);
-    // const hasNoteMention = noteRegex.test(props.note.content);
-    // const hasAddrMention = addrRegexG.test(props.note.content);
-    // const hasLinks = urlRegexG.test(props.note.content);
-
     const lnCount = props.note.content.match(linebreakRegex)?.length || 0;
 
     if (lnCount > 0) return false;
@@ -318,7 +314,6 @@ const Note: Component<NoteProps> = (props) => {
       .replace(imageRegexG, '__PRIMAL_REPLACEMENT__')
       .replace(noteRegex, '__PRIMAL_REPLACEMENT__')
       .replace(addrRegexG, '__PRIMAL_REPLACEMENT__')
-      // .replace(profileRegexG, '__PRIMAL_REPLACEMENT__')
       .replace(urlRegexG, '__PRIMAL_REPLACEMENT__')
       .trim();
 
@@ -331,7 +326,6 @@ const Note: Component<NoteProps> = (props) => {
     const isShort = strippedContent.length < 42;
     const isReply = props.note.replyTo;
 
-    // return !hasImage && !hasLinks && !hasNoteMention && !hasAddrMention && isShort;
     return isShort && !isReply;
   }
 
@@ -374,6 +368,7 @@ const Note: Component<NoteProps> = (props) => {
                     customZapInfo={customZapInfo()}
                     size="notif"
                     onDelete={props.onRemove}
+                    onTranslate={props.onTranslate}
                   />
                 </div>
               </Show>
@@ -419,7 +414,6 @@ const Note: Component<NoteProps> = (props) => {
                 topZaps={reactionsState.topZapsFeed}
                 zapCount={reactionsState.zapCount}
                 action={() => openReactionModal('zaps')}
-                // doZap={() => app?.actions.openCustomZapModal(customZapInfo())}
               />
             </div>
 
@@ -499,6 +493,7 @@ const Note: Component<NoteProps> = (props) => {
                   onZapAnim={addTopZap}
                   noteType="primary"
                   onDelete={props.onRemove}
+                  onTranslate={props.onTranslate}
                 />
               </div>
             </Show>
@@ -523,9 +518,7 @@ const Note: Component<NoteProps> = (props) => {
             class={styles.userHeader}
             href={app?.actions.profileLink(props.note.user.npub) || ''}
           >
-            {/* <A href={app?.actions.profileLink(props.note.user.npub) || ''}> */}
-              <Avatar user={props.note.user} size="xs" />
-            {/* </A> */}
+            <Avatar user={props.note.user} size="xs" />
 
             <NoteAuthorInfo
               author={props.note.user}
@@ -546,7 +539,6 @@ const Note: Component<NoteProps> = (props) => {
 
           <div
             class={`${styles.message} ${bigMessageFont() ? styles.bigFont : ''}`}
-            // href={!props.onClick ? noteLinkId() : ''}
             onClick={() => navToThread(props.note)}
           >
             <ParsedNote
@@ -573,6 +565,7 @@ const Note: Component<NoteProps> = (props) => {
               onZapAnim={addTopZapFeed}
               size={size()}
               onDelete={props.onRemove}
+              onTranslate={props.onTranslate}
             />
           </Show>
         </div>
@@ -626,7 +619,6 @@ const Note: Component<NoteProps> = (props) => {
 
               <div
                 class={styles.message}
-                // href={!props.onClick ? noteLinkId() : ''}
                 onClick={(e) => {
                   if (app?.showNoteVideoContextMenu) {
                     e.preventDefault();
@@ -661,6 +653,7 @@ const Note: Component<NoteProps> = (props) => {
                     onZapAnim={addTopZapFeed}
                     size="short"
                     onDelete={props.onRemove}
+                    onTranslate={props.onTranslate}
                   />
                 </div>
               </Show>
@@ -714,12 +707,10 @@ const Note: Component<NoteProps> = (props) => {
         </a>
       </Match>
 
-
       <Match when={noteType() === 'suggestion'}>
         <div
           id={props.id}
           class={`${styles.noteSuggestion}`}
-          // href={!props.onClick ? noteLinkId() : ''}
           onClick={() => navToThread(props.note)}
           data-event={props.note.post.id}
           data-event-bech32={props.note.post.noteId}
@@ -732,9 +723,7 @@ const Note: Component<NoteProps> = (props) => {
           </div>
           <div class={styles.content}>
             <div class={styles.leftSide}>
-              {/* <A href={app?.actions.profileLink(props.note.user.npub) || ''}> */}
-                <Avatar user={props.note.user} size="vs" />
-              {/* </A> */}
+              <Avatar user={props.note.user} size="vs" />
               <Show
                 when={props.parent}
               >
