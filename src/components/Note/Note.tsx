@@ -78,9 +78,23 @@ const Note: Component<NoteProps> = (props) => {
   const navigate = useNavigate();
 
   const [translatedText, setTranslatedText] = createSignal<string | null>(null);
+  const [showTranslation, setShowTranslation] = createSignal<boolean>(false);
   const [isTranslating, setIsTranslating] = createSignal<boolean>(false);
 
+  // Réinitialiser la traduction si l'ID de la note change
+  createEffect(on(() => props.note.post?.id, () => {
+    setTranslatedText(null);
+    setShowTranslation(false);
+    setIsTranslating(false);
+  }));
+
   const handleTranslate = async () => {
+    // 1. Si déjà traduit, basculer simplement la visibilité
+    if (translatedText()) {
+      setShowTranslation(prev => !prev);
+      return;
+    }
+
     if (isTranslating()) return;
     setIsTranslating(true);
 
@@ -89,11 +103,15 @@ const Note: Component<NoteProps> = (props) => {
         props.onTranslate();
       }
 
-      const response = await fetch(`https://api.mytory.com/translate?text=${encodeURIComponent(props.note.content)}&target=fr`);
+      const contentToTranslate = props.note.post?.content || props.note.content;
+      const response = await fetch(`https://api.mytory.com/translate?text=${encodeURIComponent(contentToTranslate)}&target=fr`);
       const data = await response.json();
 
       if (data && data.translatedText) {
-        setTranslatedText(data.translatedText);
+        batch(() => {
+          setTranslatedText(data.translatedText);
+          setShowTranslation(true);
+        });
       }
     } catch (err) {
       console.error("Erreur de traduction :", err);
@@ -331,11 +349,12 @@ const Note: Component<NoteProps> = (props) => {
   const size = () => props.size ?? 'normal';
 
   const bigMessageFont = () => {
-    const lnCount = props.note.content.match(linebreakRegex)?.length || 0;
+    const noteContent = props.note.post?.content || props.note.content || '';
+    const lnCount = noteContent.match(linebreakRegex)?.length || 0;
 
     if (lnCount > 0) return false;
 
-    let strippedContent = props.note.content
+    let strippedContent = noteContent
       .replace(imageRegexG, '__PRIMAL_REPLACEMENT__')
       .replace(noteRegex, '__PRIMAL_REPLACEMENT__')
       .replace(addrRegexG, '__PRIMAL_REPLACEMENT__')
@@ -382,7 +401,7 @@ const Note: Component<NoteProps> = (props) => {
                   note={props.note}
                   shorten={true}
                 />
-                <Show when={translatedText()}>
+                <Show when={showTranslation() && translatedText()}>
                   <div class={styles.translatedContent}>
                     <p>{translatedText()}</p>
                   </div>
@@ -437,7 +456,7 @@ const Note: Component<NoteProps> = (props) => {
                 width={Math.min(598, window.innerWidth)}
                 margins={isPhone() ? 42 : 1}
               />
-              <Show when={translatedText()}>
+              <Show when={showTranslation() && translatedText()}>
                 <div class={styles.translatedContent}>
                   <p>{translatedText()}</p>
                 </div>
@@ -582,7 +601,7 @@ const Note: Component<NoteProps> = (props) => {
               width={window.innerWidth}
               margins={45}
             />
-            <Show when={translatedText()}>
+            <Show when={showTranslation() && translatedText()}>
               <div class={styles.translatedContent}>
                 <p>{translatedText()}</p>
               </div>
@@ -674,7 +693,7 @@ const Note: Component<NoteProps> = (props) => {
                   margins={1}
                   footerSize="short"
                 />
-                <Show when={translatedText()}>
+                <Show when={showTranslation() && translatedText()}>
                   <div class={styles.translatedContent}>
                     <p>{translatedText()}</p>
                   </div>
@@ -746,7 +765,7 @@ const Note: Component<NoteProps> = (props) => {
                   noLightbox={true}
                   altEmbeds={true}
                 />
-                <Show when={translatedText()}>
+                <Show when={showTranslation() && translatedText()}>
                   <div class={styles.translatedContent}>
                     <p>{translatedText()}</p>
                   </div>
@@ -797,7 +816,7 @@ const Note: Component<NoteProps> = (props) => {
                   margins={58}
                   footerSize="short"
                 />
-                <Show when={translatedText()}>
+                <Show when={showTranslation() && translatedText()}>
                   <div class={styles.translatedContent}>
                     <p>{translatedText()}</p>
                   </div>
