@@ -382,6 +382,11 @@ const Note: Component<NoteProps> = (props) => {
                   note={props.note}
                   shorten={true}
                 />
+                <Show when={translatedText()}>
+                  <div class={styles.translatedContent}>
+                    <p>{translatedText()}</p>
+                  </div>
+                </Show>
               </div>
 
               <Show when={!props.hideFooter}>
@@ -432,6 +437,11 @@ const Note: Component<NoteProps> = (props) => {
                 width={Math.min(598, window.innerWidth)}
                 margins={isPhone() ? 42 : 1}
               />
+              <Show when={translatedText()}>
+                <div class={styles.translatedContent}>
+                  <p>{translatedText()}</p>
+                </div>
+              </Show>
             </div>
 
             <div class={styles.topZaps}>
@@ -572,6 +582,11 @@ const Note: Component<NoteProps> = (props) => {
               width={window.innerWidth}
               margins={45}
             />
+            <Show when={translatedText()}>
+              <div class={styles.translatedContent}>
+                <p>{translatedText()}</p>
+              </div>
+            </Show>
           </div>
 
           <NoteTopZapsCompact
@@ -659,6 +674,11 @@ const Note: Component<NoteProps> = (props) => {
                   margins={1}
                   footerSize="short"
                 />
+                <Show when={translatedText()}>
+                  <div class={styles.translatedContent}>
+                    <p>{translatedText()}</p>
+                  </div>
+                </Show>
               </div>
 
               <NoteTopZapsCompact
@@ -726,6 +746,11 @@ const Note: Component<NoteProps> = (props) => {
                   noLightbox={true}
                   altEmbeds={true}
                 />
+                <Show when={translatedText()}>
+                  <div class={styles.translatedContent}>
+                    <p>{translatedText()}</p>
+                  </div>
+                </Show>
               </div>
             </div>
           </div>
@@ -772,6 +797,11 @@ const Note: Component<NoteProps> = (props) => {
                   margins={58}
                   footerSize="short"
                 />
+                <Show when={translatedText()}>
+                  <div class={styles.translatedContent}>
+                    <p>{translatedText()}</p>
+                  </div>
+                </Show>
               </div>
             </div>
           </div>
