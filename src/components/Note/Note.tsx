@@ -103,8 +103,13 @@ const Note: Component<NoteProps> = (props) => {
         props.onTranslate();
       }
 
-      const contentToTranslate = props.note.post?.content || props.note.content;
-      const response = await fetch(`https://api.mytory.com/translate?text=${encodeURIComponent(contentToTranslate)}&target=fr`);
+      // Détection automatique de la langue cible préférée par l'utilisateur
+      const targetLang = (navigator.language || 'en').split('-')[0];
+      const contentToTranslate = props.note.post?.content || props.note.content || '';
+
+      const response = await fetch(
+        `https://api.mytory.com/translate?text=${encodeURIComponent(contentToTranslate)}&target=${targetLang}`
+      );
       const data = await response.json();
 
       if (data && data.translatedText) {
